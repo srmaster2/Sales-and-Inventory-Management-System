@@ -1,4 +1,4 @@
-// Dashboard Module
+// Dashboard Module - Fixed Version
 
 class Dashboard {
     constructor() {
@@ -16,21 +16,37 @@ class Dashboard {
 
     async loadData() {
         try {
-            loading.show("dashboard");
-            const response = await api.getDashboardStats();
+            // التحقق من وجود loading module
+            if (window.loading) {
+                window.loading.show("dashboard");
+            }
+
+            // التحقق من وجود api module
+            if (!window.api) {
+                throw new Error('API module not found');
+            }
+
+            const response = await window.api.getDashboardStats();
             
-            if (response.success) {
-                this.stats = response.data.stats;
-                this.recentSales = response.data.recentSales;
-                this.lowStockProducts = response.data.lowStockProducts;
+            if (response && response.success) {
+                this.stats = response.data.stats || {};
+                this.recentSales = response.data.recentSales || [];
+                this.lowStockProducts = response.data.lowStockProducts || [];
             } else {
-                toast.error('فشل في تحميل بيانات لوحة المعلومات');
+                if (window.toast) {
+                    window.toast.error('فشل في تحميل بيانات لوحة المعلومات');
+                }
+                console.error('Failed to load dashboard data');
             }
         } catch (error) {
             console.error('Dashboard data loading error:', error);
-            toast.error('حدث خطأ في تحميل البيانات');
+            if (window.toast) {
+                window.toast.error('حدث خطأ في تحميل البيانات');
+            }
         } finally {
-            loading.hide('dashboard');
+            if (window.loading) {
+                window.loading.hide('dashboard');
+            }
         }
     }
 
@@ -80,7 +96,7 @@ class Dashboard {
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">المبيعات الأخيرة</h3>
-                                <a href="#" class="btn btn-ghost btn-sm" onclick="app.showModule('sales')">
+                                <a href="#" class="btn btn-ghost btn-sm" onclick="this.showSalesModule()">
                                     عرض الكل
                                 </a>
                             </div>
@@ -94,7 +110,7 @@ class Dashboard {
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">تنبيهات المخزون</h3>
-                                <a href="#" class="btn btn-ghost btn-sm" onclick="app.showModule('inventory')">
+                                <a href="#" class="btn btn-ghost btn-sm" onclick="this.showInventoryModule()">
                                     عرض الكل
                                 </a>
                             </div>
@@ -109,19 +125,19 @@ class Dashboard {
                 <div class="quick-actions">
                     <h3>إجراءات سريعة</h3>
                     <div class="quick-actions-grid">
-                        <button class="quick-action-btn" onclick="app.showModule('sales'); salesModule.showAddSaleModal();">
+                        <button class="quick-action-btn" onclick="window.dashboardModule.showAddSale()">
                             <i class="fas fa-plus-circle"></i>
                             <span>بيع جديد</span>
                         </button>
-                        <button class="quick-action-btn" onclick="app.showModule('inventory'); inventoryModule.showAddProductModal();">
+                        <button class="quick-action-btn" onclick="window.dashboardModule.showAddProduct()">
                             <i class="fas fa-box"></i>
                             <span>منتج جديد</span>
                         </button>
-                        <button class="quick-action-btn" onclick="app.showModule('customers'); customersModule.showAddCustomerModal();">
+                        <button class="quick-action-btn" onclick="window.dashboardModule.showAddCustomer()">
                             <i class="fas fa-user-plus"></i>
                             <span>عميل جديد</span>
                         </button>
-                        <button class="quick-action-btn" onclick="app.showModule('reports');">
+                        <button class="quick-action-btn" onclick="window.dashboardModule.showReports()">
                             <i class="fas fa-chart-line"></i>
                             <span>التقارير</span>
                         </button>
@@ -130,7 +146,14 @@ class Dashboard {
             </div>
         `;
 
-                        window.utils.$("page-content").innerHTML = content;
+        // استخدام طريقة آمنة للوصول للعنصر
+        const pageContent = document.getElementById('page-content');
+        if (pageContent) {
+            pageContent.innerHTML = content;
+        } else {
+            console.error('Page content element not found');
+            return;
+        }
         
         // Initialize charts after DOM is ready
         setTimeout(() => {
@@ -142,7 +165,7 @@ class Dashboard {
         const cards = [
             {
                 title: 'إجمالي المبيعات',
-                value: window.utils.formatCurrency(this.stats.totalSales || 0),
+                value: this.formatCurrency(this.stats.totalSales || 0),
                 change: `+${this.stats.salesGrowth || 0}%`,
                 changeType: 'positive',
                 icon: 'fas fa-chart-line',
@@ -150,7 +173,7 @@ class Dashboard {
             },
             {
                 title: 'صافي الربح',
-                value: window.utils.formatCurrency(this.stats.totalProfit || 0),
+                value: this.formatCurrency(this.stats.totalProfit || 0),
                 change: `${this.stats.profitMargin || 0}%`,
                 changeType: 'positive',
                 icon: 'fas fa-money-bill-wave',
@@ -158,7 +181,7 @@ class Dashboard {
             },
             {
                 title: 'المنتجات المباعة',
-                value: window.utils.formatNumber(this.stats.totalProducts || 0),
+                value: this.formatNumber(this.stats.totalProducts || 0),
                 change: '+15 اليوم',
                 changeType: 'positive',
                 icon: 'fas fa-boxes',
@@ -166,7 +189,7 @@ class Dashboard {
             },
             {
                 title: 'العملاء الجدد',
-                value: window.utils.formatNumber(this.stats.newCustomers || 0),
+                value: this.formatNumber(this.stats.newCustomers || 0),
                 change: '+5 هذا الأسبوع',
                 changeType: 'positive',
                 icon: 'fas fa-users',
@@ -201,13 +224,13 @@ class Dashboard {
                 ${this.recentSales.map(sale => `
                     <div class="recent-sale-item">
                         <div class="sale-info">
-                            <div class="sale-customer">${sale.customer}</div>
-                            <div class="sale-time">${window.utils.formatRelativeTime(sale.date)}</div>
+                            <div class="sale-customer">${sale.customer || 'غير محدد'}</div>
+                            <div class="sale-time">${this.formatRelativeTime(sale.date)}</div>
                         </div>
-                        <div class="sale-amount">${window.utils.formatCurrency(sale.amount)}</div>
+                        <div class="sale-amount">${this.formatCurrency(sale.amount || 0)}</div>
                         <div class="sale-status">
                             <span class="badge ${sale.status === 'مكتملة' ? 'badge-success' : 'badge-warning'}">
-                                ${sale.status}
+                                ${sale.status || 'غير محدد'}
                             </span>
                         </div>
                     </div>
@@ -226,17 +249,17 @@ class Dashboard {
                 ${this.lowStockProducts.map(product => `
                     <div class="low-stock-item">
                         <div class="product-info">
-                            <div class="product-name">${product.name}</div>
+                            <div class="product-name">${product.name || 'غير محدد'}</div>
                             <div class="stock-info">
-                                <span class="current-stock">${product.currentStock}</span>
+                                <span class="current-stock">${product.currentStock || 0}</span>
                                 /
-                                <span class="min-stock">${product.minStock}</span>
+                                <span class="min-stock">${product.minStock || 0}</span>
                             </div>
                         </div>
                         <div class="stock-progress">
                             <div class="progress">
                                 <div class="progress-bar danger" 
-                                     style="width: ${(product.currentStock / product.minStock) * 100}%">
+                                     style="width: ${this.calculateProgressWidth(product.currentStock, product.minStock)}%">
                                 </div>
                             </div>
                         </div>
@@ -247,13 +270,22 @@ class Dashboard {
     }
 
     initCharts() {
+        // التحقق من وجود Chart.js
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js library not found');
+            return;
+        }
+
         this.initSalesChart();
         this.initSalesDistributionChart();
     }
 
     initSalesChart() {
-        const ctx = $('sales-chart');
-        if (!ctx) return;
+        const ctx = document.getElementById('sales-chart');
+        if (!ctx) {
+            console.error('Sales chart canvas not found');
+            return;
+        }
 
         // Sample data - replace with real data
         const data = {
@@ -283,8 +315,8 @@ class Dashboard {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            callback: function(value) {
-                                return formatCurrency(value);
+                            callback: (value) => {
+                                return this.formatCurrency(value);
                             }
                         }
                     }
@@ -300,8 +332,11 @@ class Dashboard {
     }
 
     initSalesDistributionChart() {
-        const ctx = $('sales-distribution-chart');
-        if (!ctx) return;
+        const ctx = document.getElementById('sales-distribution-chart');
+        if (!ctx) {
+            console.error('Sales distribution chart canvas not found');
+            return;
+        }
 
         const data = {
             labels: ['أجهزة كمبيوتر', 'ملحقات', 'شاشات', 'أخرى'],
@@ -338,7 +373,7 @@ class Dashboard {
 
     bindEvents() {
         // Chart period change
-        const periodSelect = $('sales-chart-period');
+        const periodSelect = document.getElementById('sales-chart-period');
         if (periodSelect) {
             periodSelect.addEventListener('change', () => {
                 this.updateSalesChart(periodSelect.value);
@@ -349,7 +384,9 @@ class Dashboard {
     updateSalesChart(period) {
         // Update chart data based on period
         // This would typically fetch new data from the API
-        toast.info(`تم تحديث المخطط للفترة: ${period}`);
+        if (window.toast) {
+            window.toast.info(`تم تحديث المخطط للفترة: ${period}`);
+        }
     }
 
     startAutoRefresh() {
@@ -377,8 +414,84 @@ class Dashboard {
         });
         this.charts = {};
     }
+
+    // Helper Methods
+    formatCurrency(amount) {
+        if (window.utils && window.utils.formatCurrency) {
+            return window.utils.formatCurrency(amount);
+        }
+        return new Intl.NumberFormat('ar-EG', {
+            style: 'currency',
+            currency: 'EGP'
+        }).format(amount);
+    }
+
+    formatNumber(number) {
+        if (window.utils && window.utils.formatNumber) {
+            return window.utils.formatNumber(number);
+        }
+        return new Intl.NumberFormat('ar-EG').format(number);
+    }
+
+    formatRelativeTime(date) {
+        if (window.utils && window.utils.formatRelativeTime) {
+            return window.utils.formatRelativeTime(date);
+        }
+        // Simple fallback
+        return new Date(date).toLocaleDateString('ar-EG');
+    }
+
+    calculateProgressWidth(current, min) {
+        if (!min || min === 0) return 0;
+        return Math.min((current / min) * 100, 100);
+    }
+
+    // Navigation methods
+    showSalesModule() {
+        if (window.app && window.app.showModule) {
+            window.app.showModule('sales');
+        }
+    }
+
+    showInventoryModule() {
+        if (window.app && window.app.showModule) {
+            window.app.showModule('inventory');
+        }
+    }
+
+    showAddSale() {
+        if (window.app && window.app.showModule) {
+            window.app.showModule('sales');
+            if (window.salesModule && window.salesModule.showAddSaleModal) {
+                window.salesModule.showAddSaleModal();
+            }
+        }
+    }
+
+    showAddProduct() {
+        if (window.app && window.app.showModule) {
+            window.app.showModule('inventory');
+            if (window.inventoryModule && window.inventoryModule.showAddProductModal) {
+                window.inventoryModule.showAddProductModal();
+            }
+        }
+    }
+
+    showAddCustomer() {
+        if (window.app && window.app.showModule) {
+            window.app.showModule('customers');
+            if (window.customersModule && window.customersModule.showAddCustomerModal) {
+                window.customersModule.showAddCustomerModal();
+            }
+        }
+    }
+
+    showReports() {
+        if (window.app && window.app.showModule) {
+            window.app.showModule('reports');
+        }
+    }
 }
 
 // Export dashboard module
 window.dashboardModule = new Dashboard();
-
