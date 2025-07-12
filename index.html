@@ -4,223 +4,774 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام إدارة المبيعات والمخزون</title>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/components.css">
-    <link rel="stylesheet" href="styles/animations.css">
-    <link rel="stylesheet" href="styles/responsive.css">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="light-theme">
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="loading-screen">
-        <div class="loading-spinner">
-            <div class="spinner"></div>
-            <p>جاري التحميل...</p>
-        </div>
-    </div>
-
-    <!-- Main Container -->
-    <div id="app" class="app-container">
-        <!-- Top Header -->
-        <header class="top-header">
-            <div class="header-left">
-                <button id="sidebar-toggle" class="sidebar-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
                 <div class="logo">
                     <i class="fas fa-chart-line"></i>
-                    <span>نظام إدارة المبيعات</span>
+                    <h2>نظام إدارة المبيعات والمخزون</h2>
                 </div>
             </div>
             
-            <div class="header-center">
-                <div class="search-container">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="global-search-input" placeholder="البحث في النظام...">
-                    <div id="search-suggestions" class="search-suggestions"></div>
-                </div>
-            </div>
-            
-            <div class="header-right">
-                <button id="notification-bell" class="header-btn">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge">3</span>
-                </button>
-                <div id="notification-dropdown" class="notification-dropdown">
-                    <div class="notification-item">
-                        <i class="fas fa-exclamation-triangle text-warning"></i>
-                        <div class="notification-content">
-                            <p>مخزون منتج "لابتوب ديل" منخفض</p>
-                            <span class="notification-time">منذ 5 دقائق</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <button id="theme-toggle" class="header-btn">
-                    <i class="fas fa-moon"></i>
-                </button>
-                
-                <div class="user-menu">
-                    <button id="user-avatar" class="user-menu-btn">
-                        <img src="images/user-placeholder.png" alt="المستخدم" class="user-avatar">
-                        <span>أحمد محمد</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div id="user-dropdown" class="user-dropdown">
-                        <a href="#"><i class="fas fa-user"></i> الملف الشخصي</a>
-                        <a href="#"><i class="fas fa-cog"></i> الإعدادات</a>
-                        <a href="#"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar">
             <nav class="sidebar-nav">
-                <ul class="nav-list">
-                    <li class="nav-item active" data-module="dashboard">
-                        <a href="#" class="nav-link">
+                <ul>
+                    <li class="nav-item active" data-section="dashboard">
+                        <a href="#" class="nav-link dashboard">
                             <i class="fas fa-tachometer-alt"></i>
                             <span>لوحة المعلومات</span>
                         </a>
                     </li>
-                    <li class="nav-item" data-module="sales">
-                        <a href="#" class="nav-link">
+                    <li class="nav-item" data-section="sales">
+                        <a href="#" class="nav-link sales">
                             <i class="fas fa-shopping-cart"></i>
                             <span>إدارة المبيعات</span>
                         </a>
                     </li>
-                    <li class="nav-item" data-module="inventory">
-                        <a href="#" class="nav-link">
+                    <li class="nav-item" data-section="inventory">
+                        <a href="#" class="nav-link inventory">
                             <i class="fas fa-boxes"></i>
                             <span>إدارة المخزون</span>
                         </a>
                     </li>
-                    <li class="nav-item" data-module="customers">
-                        <a href="#" class="nav-link">
+                    <li class="nav-item" data-section="customers">
+                        <a href="#" class="nav-link customers">
                             <i class="fas fa-users"></i>
                             <span>إدارة العملاء</span>
                         </a>
                     </li>
-                    <li class="nav-item" data-module="suppliers">
-                        <a href="#" class="nav-link">
+                    <li class="nav-item" data-section="suppliers">
+                        <a href="#" class="nav-link suppliers">
                             <i class="fas fa-truck"></i>
                             <span>إدارة الموردين</span>
                         </a>
                     </li>
-                    <li class="nav-item" data-module="invoices">
-                        <a href="#" class="nav-link">
+                    <li class="nav-item" data-section="invoices">
+                        <a href="#" class="nav-link invoices">
                             <i class="fas fa-file-invoice"></i>
                             <span>الفواتير</span>
                         </a>
                     </li>
-                    <li class="nav-item" data-module="expenses">
-                        <a href="#" class="nav-link">
+                    <li class="nav-item" data-section="expenses">
+                        <a href="#" class="nav-link expenses">
                             <i class="fas fa-money-bill-wave"></i>
                             <span>المصروفات</span>
                         </a>
                     </li>
-                    <li class="nav-item" data-module="returns">
-                        <a href="#" class="nav-link">
+                    <li class="nav-item" data-section="returns">
+                        <a href="#" class="nav-link returns">
                             <i class="fas fa-undo"></i>
                             <span>المرتجعات</span>
                         </a>
                     </li>
-                    <li class="nav-item" data-module="reports">
-                        <a href="#" class="nav-link">
+                    <li class="nav-item" data-section="reports">
+                        <a href="#" class="nav-link reports">
                             <i class="fas fa-chart-bar"></i>
                             <span>التقارير والتحليلات</span>
                         </a>
                     </li>
                 </ul>
             </nav>
+            
+            <div class="sidebar-footer">
+                <p>Made with <i class="fas fa-heart"></i> Ezzat Mahmoud</p>
+            </div>
         </aside>
 
         <!-- Main Content -->
-        <main id="main-content" class="main-content">
-            <div class="content-header">
-                <div class="breadcrumb">
-                    <span class="breadcrumb-item active">لوحة المعلومات</span>
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="search-container">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="البحث..." id="searchInput">
+                        </div>
+                    </div>
                 </div>
-                <button id="quick-add-btn" class="quick-add-btn">
-                    <i class="fas fa-plus"></i>
-                    <span>إضافة سريعة</span>
-                </button>
-            </div>
-            
-            <div id="page-content" class="page-content">
-                <!-- Dynamic content will be loaded here -->
+                
+                <div class="header-right">
+                    <button class="theme-toggle" id="themeToggle" title="تبديل الوضع الليلي">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    
+                    <div class="notifications-container">
+                        <button class="notifications-btn" id="notificationsBtn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notificationBadge">3</span>
+                        </button>
+                        <div class="notifications-dropdown" id="notificationsDropdown">
+                            <div class="notifications-header">
+                                <h3>الإشعارات</h3>
+                                <button class="mark-all-read" id="markAllRead">تعيين الكل كمقروء</button>
+                            </div>
+                            <div class="notifications-list" id="notificationsList">
+                                <!-- Notifications will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="quick-add-btn" id="quickAddBtn">
+                        <i class="fas fa-plus"></i>
+                        إضافة سريعة
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="content-section active">
+                    <div class="section-header">
+                        <h1>لوحة المعلومات</h1>
+                        <p>نظرة عامة على أداء النظام</p>
+                        <div class="date-filter">
+                            <select id="dateFilter">
+                                <option value="today">اليوم</option>
+                                <option value="week" selected>هذا الأسبوع</option>
+                                <option value="month">هذا الشهر</option>
+                                <option value="year">هذا العام</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card sales-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>إجمالي المبيعات</h3>
+                                <p class="stat-number">125,450 ر.س</p>
+                                <span class="stat-change positive">+12.5%</span>
+                                <div class="stat-details">
+                                    <small>مقارنة بالأسبوع الماضي</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card inventory-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>المنتجات في المخزون</h3>
+                                <p class="stat-number">1,247</p>
+                                <span class="stat-change negative">-3.2%</span>
+                                <div class="stat-details">
+                                    <small>15 منتج نفد من المخزون</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card customers-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>العملاء النشطين</h3>
+                                <p class="stat-number">342</p>
+                                <span class="stat-change positive">+8.1%</span>
+                                <div class="stat-details">
+                                    <small>23 عميل جديد هذا الأسبوع</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card orders-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>الطلبات الجديدة</h3>
+                                <p class="stat-number">89</p>
+                                <span class="stat-change positive">+15.3%</span>
+                                <div class="stat-details">
+                                    <small>12 طلب في انتظار المعالجة</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>مبيعات الشهر الحالي</h3>
+                                <div class="chart-controls">
+                                    <button class="chart-btn active" data-chart="sales">المبيعات</button>
+                                    <button class="chart-btn" data-chart="orders">الطلبات</button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="salesChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <h3>أفضل المنتجات مبيعاً</h3>
+                            <div class="top-products">
+                                <div class="product-item">
+                                    <div class="product-info">
+                                        <span class="product-name">لابتوب Dell XPS 13</span>
+                                        <span class="product-category">إلكترونيات</span>
+                                    </div>
+                                    <div class="product-stats">
+                                        <span class="product-sales">245 قطعة</span>
+                                        <span class="product-revenue">367,500 ر.س</span>
+                                    </div>
+                                </div>
+                                <div class="product-item">
+                                    <div class="product-info">
+                                        <span class="product-name">هاتف iPhone 15</span>
+                                        <span class="product-category">إلكترونيات</span>
+                                    </div>
+                                    <div class="product-stats">
+                                        <span class="product-sales">198 قطعة</span>
+                                        <span class="product-revenue">891,000 ر.س</span>
+                                    </div>
+                                </div>
+                                <div class="product-item">
+                                    <div class="product-info">
+                                        <span class="product-name">ساعة Apple Watch</span>
+                                        <span class="product-category">إكسسوارات</span>
+                                    </div>
+                                    <div class="product-stats">
+                                        <span class="product-sales">156 قطعة</span>
+                                        <span class="product-revenue">234,000 ر.س</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <h3>الطلبات الأخيرة</h3>
+                            <div class="recent-orders">
+                                <div class="order-item">
+                                    <div class="order-info">
+                                        <span class="order-id">#ORD-001</span>
+                                        <span class="customer-name">أحمد محمد</span>
+                                    </div>
+                                    <div class="order-details">
+                                        <span class="order-amount">1,250 ر.س</span>
+                                        <span class="order-status completed">مكتمل</span>
+                                    </div>
+                                </div>
+                                <div class="order-item">
+                                    <div class="order-info">
+                                        <span class="order-id">#ORD-002</span>
+                                        <span class="customer-name">فاطمة علي</span>
+                                    </div>
+                                    <div class="order-details">
+                                        <span class="order-amount">850 ر.س</span>
+                                        <span class="order-status pending">قيد المعالجة</span>
+                                    </div>
+                                </div>
+                                <div class="order-item">
+                                    <div class="order-info">
+                                        <span class="order-id">#ORD-003</span>
+                                        <span class="customer-name">محمد سالم</span>
+                                    </div>
+                                    <div class="order-details">
+                                        <span class="order-amount">2,100 ر.س</span>
+                                        <span class="order-status shipped">تم الشحن</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <h3>تنبيهات المخزون</h3>
+                            <div class="inventory-alerts">
+                                <div class="alert-item critical">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <div class="alert-info">
+                                        <span class="alert-title">نفاد المخزون</span>
+                                        <span class="alert-desc">5 منتجات نفدت من المخزون</span>
+                                    </div>
+                                </div>
+                                <div class="alert-item warning">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <div class="alert-info">
+                                        <span class="alert-title">مخزون منخفض</span>
+                                        <span class="alert-desc">12 منتج أقل من الحد الأدنى</span>
+                                    </div>
+                                </div>
+                                <div class="alert-item info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div class="alert-info">
+                                        <span class="alert-title">طلبات شراء</span>
+                                        <span class="alert-desc">3 طلبات شراء في انتظار الموافقة</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sales Section -->
+                <section id="sales" class="content-section">
+                    <div class="section-header">
+                        <h1>إدارة المبيعات</h1>
+                        <p>إدارة عمليات البيع وتتبع الطلبات</p>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="addSaleBtn">
+                            <i class="fas fa-plus"></i>
+                            إضافة عملية بيع جديدة
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-file-export"></i>
+                            تصدير البيانات
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-filter"></i>
+                            تصفية النتائج
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>قائمة المبيعات</h3>
+                            <div class="table-controls">
+                                <input type="text" placeholder="البحث في المبيعات..." class="table-search">
+                                <select class="table-filter">
+                                    <option value="all">جميع الحالات</option>
+                                    <option value="completed">مكتمل</option>
+                                    <option value="pending">قيد المعالجة</option>
+                                    <option value="cancelled">ملغي</option>
+                                </select>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>رقم الطلب</th>
+                                    <th>العميل</th>
+                                    <th>التاريخ</th>
+                                    <th>المنتجات</th>
+                                    <th>المبلغ</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesTableBody">
+                                <!-- Sales data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Inventory Section -->
+                <section id="inventory" class="content-section">
+                    <div class="section-header">
+                        <h1>إدارة المخزون</h1>
+                        <p>تتبع المنتجات والكميات وإدارة المستودعات</p>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="addProductBtn">
+                            <i class="fas fa-plus"></i>
+                            إضافة منتج جديد
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-download"></i>
+                            استيراد منتجات
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            تقرير النواقص
+                        </button>
+                    </div>
+                    
+                    <div class="inventory-stats">
+                        <div class="inventory-stat">
+                            <i class="fas fa-box"></i>
+                            <div>
+                                <span class="stat-label">إجمالي المنتجات</span>
+                                <span class="stat-value">1,247</span>
+                            </div>
+                        </div>
+                        <div class="inventory-stat">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <span class="stat-label">مخزون منخفض</span>
+                                <span class="stat-value">15</span>
+                            </div>
+                        </div>
+                        <div class="inventory-stat">
+                            <i class="fas fa-times-circle"></i>
+                            <div>
+                                <span class="stat-label">نفد من المخزون</span>
+                                <span class="stat-value">5</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>قائمة المنتجات</h3>
+                            <div class="table-controls">
+                                <input type="text" placeholder="البحث في المنتجات..." class="table-search">
+                                <select class="table-filter">
+                                    <option value="all">جميع الفئات</option>
+                                    <option value="electronics">إلكترونيات</option>
+                                    <option value="clothing">ملابس</option>
+                                    <option value="accessories">إكسسوارات</option>
+                                </select>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>كود المنتج</th>
+                                    <th>اسم المنتج</th>
+                                    <th>الفئة</th>
+                                    <th>الكمية</th>
+                                    <th>السعر</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTableBody">
+                                <!-- Inventory data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Customers Section -->
+                <section id="customers" class="content-section">
+                    <div class="section-header">
+                        <h1>إدارة العملاء</h1>
+                        <p>إدارة بيانات العملاء وسجلات الشراء</p>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="addCustomerBtn">
+                            <i class="fas fa-plus"></i>
+                            إضافة عميل جديد
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-file-export"></i>
+                            تصدير قائمة العملاء
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-envelope"></i>
+                            إرسال رسائل جماعية
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>قائمة العملاء</h3>
+                            <div class="table-controls">
+                                <input type="text" placeholder="البحث في العملاء..." class="table-search">
+                                <select class="table-filter">
+                                    <option value="all">جميع العملاء</option>
+                                    <option value="active">نشط</option>
+                                    <option value="inactive">غير نشط</option>
+                                </select>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>رقم العميل</th>
+                                    <th>الاسم</th>
+                                    <th>البريد الإلكتروني</th>
+                                    <th>الهاتف</th>
+                                    <th>إجمالي المشتريات</th>
+                                    <th>آخر شراء</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTableBody">
+                                <!-- Customers data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Other sections with similar structure -->
+                <section id="suppliers" class="content-section">
+                    <div class="section-header">
+                        <h1>إدارة الموردين</h1>
+                        <p>إدارة بيانات الموردين وطلبات الشراء</p>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            إضافة مورد جديد
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-shopping-cart"></i>
+                            طلب شراء جديد
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>رقم المورد</th>
+                                    <th>اسم المورد</th>
+                                    <th>نوع المنتجات</th>
+                                    <th>الهاتف</th>
+                                    <th>إجمالي المشتريات</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="suppliersTableBody">
+                                <!-- Suppliers data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="invoices" class="content-section">
+                    <div class="section-header">
+                        <h1>الفواتير</h1>
+                        <p>إنشاء وإدارة الفواتير الصادرة والواردة</p>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            إنشاء فاتورة جديدة
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-print"></i>
+                            طباعة الفواتير
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>رقم الفاتورة</th>
+                                    <th>العميل</th>
+                                    <th>التاريخ</th>
+                                    <th>المبلغ</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoicesTableBody">
+                                <!-- Invoices data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="expenses" class="content-section">
+                    <div class="section-header">
+                        <h1>المصروفات</h1>
+                        <p>تسجيل وتتبع المصروفات التشغيلية</p>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            إضافة مصروف جديد
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-chart-pie"></i>
+                            تقرير المصروفات
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>رقم المصروف</th>
+                                    <th>الوصف</th>
+                                    <th>الفئة</th>
+                                    <th>المبلغ</th>
+                                    <th>التاريخ</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expensesTableBody">
+                                <!-- Expenses data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="returns" class="content-section">
+                    <div class="section-header">
+                        <h1>المرتجعات</h1>
+                        <p>إدارة عمليات إرجاع المنتجات</p>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            تسجيل مرتجع جديد
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-chart-line"></i>
+                            تقرير المرتجعات
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>رقم المرتجع</th>
+                                    <th>رقم الطلب الأصلي</th>
+                                    <th>العميل</th>
+                                    <th>المنتج</th>
+                                    <th>السبب</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="returnsTableBody">
+                                <!-- Returns data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="reports" class="content-section">
+                    <div class="section-header">
+                        <h1>التقارير والتحليلات</h1>
+                        <p>تقارير مفصلة وتحليلات للأداء</p>
+                    </div>
+                    
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>تقرير المبيعات</h3>
+                            <p>تحليل مفصل لأداء المبيعات</p>
+                            <button class="btn btn-primary">عرض التقرير</button>
+                        </div>
+                        <div class="report-card">
+                            <i class="fas fa-boxes"></i>
+                            <h3>تقرير المخزون</h3>
+                            <p>حالة المخزون والحركة</p>
+                            <button class="btn btn-primary">عرض التقرير</button>
+                        </div>
+                        <div class="report-card">
+                            <i class="fas fa-users"></i>
+                            <h3>تقرير العملاء</h3>
+                            <p>تحليل سلوك العملاء</p>
+                            <button class="btn btn-primary">عرض التقرير</button>
+                        </div>
+                        <div class="report-card">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <h3>التقرير المالي</h3>
+                            <p>الأرباح والخسائر</p>
+                            <button class="btn btn-primary">عرض التقرير</button>
+                        </div>
+                    </div>
+                </section>
             </div>
         </main>
     </div>
 
-    <!-- Floating Action Button -->
-    <button id="fab-button" class="fab">
-        <i class="fas fa-plus"></i>
-    </button>
-
-    <!-- Notifications Panel -->
-    <div id="notifications-panel" class="notifications-panel">
-        <div class="panel-header">
-            <h3>الإشعارات</h3>
-            <button id="close-notifications" class="close-btn">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="notifications-list">
-            <div class="notification-item unread">
-                <i class="fas fa-exclamation-triangle text-warning"></i>
-                <div class="notification-content">
-                    <p>مخزون منتج "لابتوب ديل" منخفض</p>
-                    <span class="notification-time">منذ 5 دقائق</span>
-                </div>
+    <!-- Quick Add Modal -->
+    <div id="quickAddModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>إضافة سريعة</h3>
+                <span class="close">&times;</span>
             </div>
-            <div class="notification-item">
-                <i class="fas fa-check-circle text-success"></i>
-                <div class="notification-content">
-                    <p>تم إتمام عملية بيع بقيمة 1,500 ج.م</p>
-                    <span class="notification-time">منذ 15 دقيقة</span>
-                </div>
-            </div>
-            <div class="notification-item">
-                <i class="fas fa-user-plus text-info"></i>
-                <div class="notification-content">
-                    <p>تم إضافة عميل جديد: محمد أحمد</p>
-                    <span class="notification-time">منذ ساعة</span>
+            <div class="modal-body">
+                <div class="quick-add-options">
+                    <button class="quick-option" data-action="sale">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>عملية بيع جديدة</span>
+                    </button>
+                    <button class="quick-option" data-action="product">
+                        <i class="fas fa-box"></i>
+                        <span>منتج جديد</span>
+                    </button>
+                    <button class="quick-option" data-action="customer">
+                        <i class="fas fa-user"></i>
+                        <span>عميل جديد</span>
+                    </button>
+                    <button class="quick-option" data-action="invoice">
+                        <i class="fas fa-file-invoice"></i>
+                        <span>فاتورة جديدة</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Container -->
-    <div id="modal-container" class="modal-container"></div>
+    <!-- Add Sale Modal -->
+    <div id="addSaleModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>إضافة عملية بيع جديدة</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addSaleForm" class="form-grid">
+                    <div class="form-group">
+                        <label>العميل</label>
+                        <select required>
+                            <option value="">اختر العميل</option>
+                            <option value="1">أحمد محمد</option>
+                            <option value="2">فاطمة علي</option>
+                            <option value="3">محمد سالم</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ البيع</label>
+                        <input type="date" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>المنتجات</label>
+                        <div class="products-selector">
+                            <button type="button" class="btn btn-secondary" id="addProductToSale">
+                                <i class="fas fa-plus"></i>
+                                إضافة منتج
+                            </button>
+                            <div id="selectedProducts" class="selected-products">
+                                <!-- Selected products will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>إجمالي المبلغ</label>
+                        <input type="number" id="totalAmount" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>طريقة الدفع</label>
+                        <select required>
+                            <option value="">اختر طريقة الدفع</option>
+                            <option value="cash">نقدي</option>
+                            <option value="card">بطاقة ائتمان</option>
+                            <option value="transfer">تحويل بنكي</option>
+                        </select>
+                    </div>
+                    <div class="form-actions full-width">
+                        <button type="submit" class="btn btn-primary">حفظ عملية البيع</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('addSaleModal')">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="toast-container"></div>
-
-    <!-- JavaScript Files -->
-    <script src="js/utils.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/components.js"></script>
-    <script src="js/modules/dashboard.js"></script>
-    <script src="js/modules/sales.js"></script>
-    <script src="js/modules/inventory.js"></script>
-    <script src="js/modules/customers.js"></script>
-    <script src="js/modules/suppliers.js"></script>
-    <script src="./js/bundle.js"></script>
-    <script src="js/main.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
-
