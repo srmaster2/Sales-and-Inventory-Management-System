@@ -474,11 +474,19 @@ function closeModal(modalId) {
 
 // CRUD Operations
 function viewItem(id) {
-    alert(`عرض تفاصيل العنصر: ${id}`);
+    // Create and show detailed view modal
+    const modal = createDetailModal(id);
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
 }
 
 function editItem(id) {
-    alert(`تعديل العنصر: ${id}`);
+    // Create and show edit modal
+    const modal = createEditModal(id);
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
 }
 
 function deleteItem(id, element) {
@@ -490,6 +498,712 @@ function deleteItem(id, element) {
             showNotification('success', 'تم الحذف بنجاح', `تم حذف العنصر ${id} بنجاح`);
         }, 300);
     }
+}
+
+// Create detailed view modal
+function createDetailModal(id) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = `detailModal-${id}`;
+    
+    // Get item details based on current section
+    const currentSection = document.querySelector('.content-section.active').id;
+    const itemDetails = getItemDetails(id, currentSection);
+    
+    modal.innerHTML = `
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>تفاصيل ${itemDetails.title}</h3>
+                <span class="close" onclick="closeDetailModal('${id}')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="detail-grid">
+                    ${itemDetails.content}
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="editItem('${id}')">
+                        <i class="fas fa-edit"></i>
+                        تعديل
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeDetailModal('${id}')">
+                        إغلاق
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return modal;
+}
+
+// Create edit modal
+function createEditModal(id) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = `editModal-${id}`;
+    
+    // Get item details based on current section
+    const currentSection = document.querySelector('.content-section.active').id;
+    const editForm = getEditForm(id, currentSection);
+    
+    modal.innerHTML = `
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>تعديل ${editForm.title}</h3>
+                <span class="close" onclick="closeEditModal('${id}')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editForm-${id}" class="form-grid" onsubmit="saveEdit('${id}', event)">
+                    ${editForm.content}
+                    <div class="form-actions full-width">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            حفظ التغييرات
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModal('${id}')">
+                            إلغاء
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    return modal;
+}
+
+// Get item details for view modal
+function getItemDetails(id, section) {
+    let item, title, content;
+    
+    switch(section) {
+        case 'sales':
+            item = sampleData.sales.find(s => s.id === id);
+            title = `الطلب ${id}`;
+            content = `
+                <div class="detail-item">
+                    <label>رقم الطلب:</label>
+                    <span>${item.id}</span>
+                </div>
+                <div class="detail-item">
+                    <label>العميل:</label>
+                    <span>${item.customer}</span>
+                </div>
+                <div class="detail-item">
+                    <label>التاريخ:</label>
+                    <span>${item.date}</span>
+                </div>
+                <div class="detail-item">
+                    <label>المنتجات:</label>
+                    <span>${item.products}</span>
+                </div>
+                <div class="detail-item">
+                    <label>المبلغ:</label>
+                    <span>${item.amount.toLocaleString()} ر.س</span>
+                </div>
+                <div class="detail-item">
+                    <label>الحالة:</label>
+                    <span class="status ${item.status}">${getStatusText(item.status)}</span>
+                </div>
+            `;
+            break;
+            
+        case 'inventory':
+            item = sampleData.inventory.find(i => i.code === id);
+            title = `المنتج ${id}`;
+            content = `
+                <div class="detail-item">
+                    <label>كود المنتج:</label>
+                    <span>${item.code}</span>
+                </div>
+                <div class="detail-item">
+                    <label>اسم المنتج:</label>
+                    <span>${item.name}</span>
+                </div>
+                <div class="detail-item">
+                    <label>الفئة:</label>
+                    <span>${item.category}</span>
+                </div>
+                <div class="detail-item">
+                    <label>الكمية المتوفرة:</label>
+                    <span>${item.quantity}</span>
+                </div>
+                <div class="detail-item">
+                    <label>السعر:</label>
+                    <span>${item.price.toLocaleString()} ر.س</span>
+                </div>
+                <div class="detail-item">
+                    <label>حالة المخزون:</label>
+                    <span class="status ${item.status}">${getStatusText(item.status)}</span>
+                </div>
+            `;
+            break;
+            
+        case 'customers':
+            item = sampleData.customers.find(c => c.id === id);
+            title = `العميل ${id}`;
+            content = `
+                <div class="detail-item">
+                    <label>رقم العميل:</label>
+                    <span>${item.id}</span>
+                </div>
+                <div class="detail-item">
+                    <label>الاسم:</label>
+                    <span>${item.name}</span>
+                </div>
+                <div class="detail-item">
+                    <label>البريد الإلكتروني:</label>
+                    <span>${item.email}</span>
+                </div>
+                <div class="detail-item">
+                    <label>الهاتف:</label>
+                    <span>${item.phone}</span>
+                </div>
+                <div class="detail-item">
+                    <label>إجمالي المشتريات:</label>
+                    <span>${item.totalPurchases.toLocaleString()} ر.س</span>
+                </div>
+                <div class="detail-item">
+                    <label>آخر شراء:</label>
+                    <span>${item.lastPurchase}</span>
+                </div>
+                <div class="detail-item">
+                    <label>الحالة:</label>
+                    <span class="status ${item.status}">${getStatusText(item.status)}</span>
+                </div>
+            `;
+            break;
+            
+        default:
+            title = `العنصر ${id}`;
+            content = `<div class="detail-item"><span>تفاصيل العنصر ${id}</span></div>`;
+    }
+    
+    return { title, content };
+}
+
+// Get edit form for edit modal
+function getEditForm(id, section) {
+    let item, title, content;
+    
+    switch(section) {
+        case 'sales':
+            item = sampleData.sales.find(s => s.id === id);
+            title = `الطلب ${id}`;
+            content = `
+                <div class="form-group">
+                    <label>العميل</label>
+                    <input type="text" name="customer" value="${item.customer}" required>
+                </div>
+                <div class="form-group">
+                    <label>التاريخ</label>
+                    <input type="date" name="date" value="${item.date}" required>
+                </div>
+                <div class="form-group full-width">
+                    <label>المنتجات</label>
+                    <input type="text" name="products" value="${item.products}" required>
+                </div>
+                <div class="form-group">
+                    <label>المبلغ</label>
+                    <input type="number" name="amount" value="${item.amount}" required>
+                </div>
+                <div class="form-group">
+                    <label>الحالة</label>
+                    <select name="status" required>
+                        <option value="completed" ${item.status === 'completed' ? 'selected' : ''}>مكتمل</option>
+                        <option value="pending" ${item.status === 'pending' ? 'selected' : ''}>قيد المعالجة</option>
+                        <option value="cancelled" ${item.status === 'cancelled' ? 'selected' : ''}>ملغي</option>
+                    </select>
+                </div>
+            `;
+            break;
+            
+        case 'inventory':
+            item = sampleData.inventory.find(i => i.code === id);
+            title = `المنتج ${id}`;
+            content = `
+                <div class="form-group">
+                    <label>اسم المنتج</label>
+                    <input type="text" name="name" value="${item.name}" required>
+                </div>
+                <div class="form-group">
+                    <label>الفئة</label>
+                    <select name="category" required>
+                        <option value="electronics" ${item.category === 'electronics' ? 'selected' : ''}>إلكترونيات</option>
+                        <option value="clothing" ${item.category === 'clothing' ? 'selected' : ''}>ملابس</option>
+                        <option value="accessories" ${item.category === 'accessories' ? 'selected' : ''}>إكسسوارات</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الكمية</label>
+                    <input type="number" name="quantity" value="${item.quantity}" required min="0">
+                </div>
+                <div class="form-group">
+                    <label>السعر</label>
+                    <input type="number" name="price" value="${item.price}" required min="0" step="0.01">
+                </div>
+            `;
+            break;
+            
+        case 'customers':
+            item = sampleData.customers.find(c => c.id === id);
+            title = `العميل ${id}`;
+            content = `
+                <div class="form-group">
+                    <label>الاسم</label>
+                    <input type="text" name="name" value="${item.name}" required>
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" name="email" value="${item.email}" required>
+                </div>
+                <div class="form-group">
+                    <label>الهاتف</label>
+                    <input type="tel" name="phone" value="${item.phone}" required>
+                </div>
+                <div class="form-group">
+                    <label>الحالة</label>
+                    <select name="status" required>
+                        <option value="active" ${item.status === 'active' ? 'selected' : ''}>نشط</option>
+                        <option value="inactive" ${item.status === 'inactive' ? 'selected' : ''}>غير نشط</option>
+                    </select>
+                </div>
+            `;
+            break;
+            
+        default:
+            title = `العنصر ${id}`;
+            content = `<div class="form-group full-width"><label>معرف العنصر</label><input type="text" value="${id}" readonly></div>`;
+    }
+    
+    return { title, content };
+}
+
+// Close detail modal
+function closeDetailModal(id) {
+    const modal = document.getElementById(`detailModal-${id}`);
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        modal.remove();
+    }
+}
+
+// Close edit modal
+function closeEditModal(id) {
+    const modal = document.getElementById(`editModal-${id}`);
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        modal.remove();
+    }
+}
+
+// Save edit changes
+function saveEdit(id, event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const currentSection = document.querySelector('.content-section.active').id;
+    
+    // Update the data based on section
+    switch(currentSection) {
+        case 'sales':
+            const saleIndex = sampleData.sales.findIndex(s => s.id === id);
+            if (saleIndex !== -1) {
+                sampleData.sales[saleIndex] = {
+                    ...sampleData.sales[saleIndex],
+                    customer: formData.get('customer'),
+                    date: formData.get('date'),
+                    products: formData.get('products'),
+                    amount: parseInt(formData.get('amount')),
+                    status: formData.get('status')
+                };
+                populateSalesTable();
+            }
+            break;
+            
+        case 'inventory':
+            const inventoryIndex = sampleData.inventory.findIndex(i => i.code === id);
+            if (inventoryIndex !== -1) {
+                const quantity = parseInt(formData.get('quantity'));
+                let status = 'in-stock';
+                if (quantity === 0) status = 'out-of-stock';
+                else if (quantity < 10) status = 'low-stock';
+                
+                sampleData.inventory[inventoryIndex] = {
+                    ...sampleData.inventory[inventoryIndex],
+                    name: formData.get('name'),
+                    category: formData.get('category'),
+                    quantity: quantity,
+                    price: parseFloat(formData.get('price')),
+                    status: status
+                };
+                populateInventoryTable();
+            }
+            break;
+            
+        case 'customers':
+            const customerIndex = sampleData.customers.findIndex(c => c.id === id);
+            if (customerIndex !== -1) {
+                sampleData.customers[customerIndex] = {
+                    ...sampleData.customers[customerIndex],
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    status: formData.get('status')
+                };
+                populateCustomersTable();
+            }
+            break;
+    }
+    
+    closeEditModal(id);
+    showNotification('success', 'تم التحديث بنجاح', `تم تحديث العنصر ${id} بنجاح`);
+}
+
+// Add new item functions
+function addNewSale() {
+    openModal('addSaleModal');
+}
+
+function addNewProduct() {
+    const modal = createAddModal('product');
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function addNewCustomer() {
+    const modal = createAddModal('customer');
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function addNewSupplier() {
+    const modal = createAddModal('supplier');
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function addNewInvoice() {
+    const modal = createAddModal('invoice');
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function addNewExpense() {
+    const modal = createAddModal('expense');
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function addNewReturn() {
+    const modal = createAddModal('return');
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+// Create add modal for different types
+function createAddModal(type) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = `addModal-${type}`;
+    
+    const forms = {
+        product: {
+            title: 'إضافة منتج جديد',
+            content: `
+                <div class="form-group">
+                    <label>كود المنتج</label>
+                    <input type="text" name="code" required placeholder="PROD-XXX">
+                </div>
+                <div class="form-group">
+                    <label>اسم المنتج</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>الفئة</label>
+                    <select name="category" required>
+                        <option value="">اختر الفئة</option>
+                        <option value="electronics">إلكترونيات</option>
+                        <option value="clothing">ملابس</option>
+                        <option value="accessories">إكسسوارات</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الكمية الأولية</label>
+                    <input type="number" name="quantity" required min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label>السعر</label>
+                    <input type="number" name="price" required min="0" step="0.01">
+                </div>
+            `
+        },
+        customer: {
+            title: 'إضافة عميل جديد',
+            content: `
+                <div class="form-group">
+                    <label>الاسم</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label>الهاتف</label>
+                    <input type="tel" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label>العنوان</label>
+                    <input type="text" name="address">
+                </div>
+            `
+        },
+        supplier: {
+            title: 'إضافة مورد جديد',
+            content: `
+                <div class="form-group">
+                    <label>اسم المورد</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>نوع المنتجات</label>
+                    <input type="text" name="products" required>
+                </div>
+                <div class="form-group">
+                    <label>الهاتف</label>
+                    <input type="tel" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" name="email">
+                </div>
+            `
+        },
+        invoice: {
+            title: 'إنشاء فاتورة جديدة',
+            content: `
+                <div class="form-group">
+                    <label>العميل</label>
+                    <select name="customer" required>
+                        <option value="">اختر العميل</option>
+                        ${sampleData.customers.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الفاتورة</label>
+                    <input type="date" name="date" required value="${new Date().toISOString().split('T')[0]}">
+                </div>
+                <div class="form-group">
+                    <label>المبلغ</label>
+                    <input type="number" name="amount" required min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>طريقة الدفع</label>
+                    <select name="paymentMethod" required>
+                        <option value="">اختر طريقة الدفع</option>
+                        <option value="cash">نقدي</option>
+                        <option value="card">بطاقة ائتمان</option>
+                        <option value="transfer">تحويل بنكي</option>
+                    </select>
+                </div>
+            `
+        },
+        expense: {
+            title: 'إضافة مصروف جديد',
+            content: `
+                <div class="form-group">
+                    <label>وصف المصروف</label>
+                    <input type="text" name="description" required>
+                </div>
+                <div class="form-group">
+                    <label>الفئة</label>
+                    <select name="category" required>
+                        <option value="">اختر الفئة</option>
+                        <option value="إيجار">إيجار</option>
+                        <option value="مرافق">مرافق</option>
+                        <option value="رواتب">رواتب</option>
+                        <option value="تسويق">تسويق</option>
+                        <option value="صيانة">صيانة</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>المبلغ</label>
+                    <input type="number" name="amount" required min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>التاريخ</label>
+                    <input type="date" name="date" required value="${new Date().toISOString().split('T')[0]}">
+                </div>
+            `
+        },
+        return: {
+            title: 'تسجيل مرتجع جديد',
+            content: `
+                <div class="form-group">
+                    <label>رقم الطلب الأصلي</label>
+                    <select name="originalOrder" required>
+                        <option value="">اختر الطلب</option>
+                        ${sampleData.sales.map(s => `<option value="${s.id}">${s.id} - ${s.customer}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>المنتج</label>
+                    <input type="text" name="product" required>
+                </div>
+                <div class="form-group full-width">
+                    <label>سبب الإرجاع</label>
+                    <textarea name="reason" required rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>الكمية المرتجعة</label>
+                    <input type="number" name="quantity" required min="1" value="1">
+                </div>
+            `
+        }
+    };
+    
+    const formData = forms[type];
+    
+    modal.innerHTML = `
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>${formData.title}</h3>
+                <span class="close" onclick="closeAddModal('${type}')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addForm-${type}" class="form-grid" onsubmit="saveNewItem('${type}', event)">
+                    ${formData.content}
+                    <div class="form-actions full-width">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            حفظ
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeAddModal('${type}')">
+                            إلغاء
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    return modal;
+}
+
+// Close add modal
+function closeAddModal(type) {
+    const modal = document.getElementById(`addModal-${type}`);
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        modal.remove();
+    }
+}
+
+// Save new item
+function saveNewItem(type, event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    switch(type) {
+        case 'product':
+            const quantity = parseInt(formData.get('quantity'));
+            let status = 'in-stock';
+            if (quantity === 0) status = 'out-of-stock';
+            else if (quantity < 10) status = 'low-stock';
+            
+            const newProduct = {
+                code: formData.get('code'),
+                name: formData.get('name'),
+                category: formData.get('category'),
+                quantity: quantity,
+                price: parseFloat(formData.get('price')),
+                status: status
+            };
+            sampleData.inventory.push(newProduct);
+            populateInventoryTable();
+            break;
+            
+        case 'customer':
+            const newCustomer = {
+                id: `CUST-${String(sampleData.customers.length + 1).padStart(3, '0')}`,
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                totalPurchases: 0,
+                lastPurchase: '-',
+                status: 'active'
+            };
+            sampleData.customers.push(newCustomer);
+            populateCustomersTable();
+            break;
+            
+        case 'supplier':
+            const newSupplier = {
+                id: `SUPP-${String(sampleData.suppliers.length + 1).padStart(3, '0')}`,
+                name: formData.get('name'),
+                products: formData.get('products'),
+                phone: formData.get('phone'),
+                totalPurchases: 0,
+                status: 'active'
+            };
+            sampleData.suppliers.push(newSupplier);
+            populateSuppliersTable();
+            break;
+            
+        case 'invoice':
+            const newInvoice = {
+                id: `INV-${String(sampleData.invoices.length + 1).padStart(3, '0')}`,
+                customer: formData.get('customer'),
+                date: formData.get('date'),
+                amount: parseFloat(formData.get('amount')),
+                status: 'pending'
+            };
+            sampleData.invoices.push(newInvoice);
+            populateInvoicesTable();
+            break;
+            
+        case 'expense':
+            const newExpense = {
+                id: `EXP-${String(sampleData.expenses.length + 1).padStart(3, '0')}`,
+                description: formData.get('description'),
+                category: formData.get('category'),
+                amount: parseFloat(formData.get('amount')),
+                date: formData.get('date')
+            };
+            sampleData.expenses.push(newExpense);
+            populateExpensesTable();
+            break;
+            
+        case 'return':
+            const newReturn = {
+                id: `RET-${String(sampleData.returns.length + 1).padStart(3, '0')}`,
+                originalOrder: formData.get('originalOrder'),
+                customer: sampleData.sales.find(s => s.id === formData.get('originalOrder'))?.customer || 'غير محدد',
+                product: formData.get('product'),
+                reason: formData.get('reason'),
+                status: 'pending'
+            };
+            sampleData.returns.push(newReturn);
+            populateReturnsTable();
+            break;
+    }
+    
+    closeAddModal(type);
+    showNotification('success', 'تم الإضافة بنجاح', `تم إضافة العنصر الجديد بنجاح`);
 }
 
 // Show notification
@@ -610,17 +1324,56 @@ document.addEventListener('click', (e) => {
         
         switch(action) {
             case 'sale':
-                openModal('addSaleModal');
+                addNewSale();
                 break;
             case 'product':
-                alert('سيتم فتح نموذج إضافة منتج جديد');
+                addNewProduct();
                 break;
             case 'customer':
-                alert('سيتم فتح نموذج إضافة عميل جديد');
+                addNewCustomer();
                 break;
             case 'invoice':
-                alert('سيتم فتح نموذج إنشاء فاتورة جديدة');
+                addNewInvoice();
                 break;
+        }
+    }
+});
+
+// Add button event listeners for all sections
+document.addEventListener('click', (e) => {
+    // Sales section
+    if (e.target.id === 'addSaleBtn' || e.target.closest('#addSaleBtn')) {
+        addNewSale();
+    }
+    
+    // Inventory section
+    if (e.target.id === 'addProductBtn' || e.target.closest('#addProductBtn')) {
+        addNewProduct();
+    }
+    
+    // Customers section
+    if (e.target.id === 'addCustomerBtn' || e.target.closest('#addCustomerBtn')) {
+        addNewCustomer();
+    }
+    
+    // Other sections - add buttons
+    if (e.target.closest('.btn-primary')) {
+        const button = e.target.closest('.btn-primary');
+        const section = button.closest('.content-section');
+        
+        if (section) {
+            const sectionId = section.id;
+            const buttonText = button.textContent.trim();
+            
+            if (buttonText.includes('إضافة مورد جديد')) {
+                addNewSupplier();
+            } else if (buttonText.includes('إنشاء فاتورة جديدة')) {
+                addNewInvoice();
+            } else if (buttonText.includes('إضافة مصروف جديد')) {
+                addNewExpense();
+            } else if (buttonText.includes('تسجيل مرتجع جديد')) {
+                addNewReturn();
+            }
         }
     }
 });
